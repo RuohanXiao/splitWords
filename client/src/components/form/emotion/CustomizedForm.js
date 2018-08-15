@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Row, Modal, Form, Input,Layout,Button, Radio, InputNumber, Cascader, Select, AutoComplete } from 'antd';
 import axios from 'axios';
-import address from '../address';
 
 const FormItem = Form.Item;
 const Option = Select.Option;

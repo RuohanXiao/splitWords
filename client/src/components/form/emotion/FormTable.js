@@ -3,21 +3,23 @@ import React,
   Component
 }
 from 'react';
+import { connect } from "react-redux";
 import {
   Table,
   Icon,
+  message,
   Popconfirm
 }
 from 'antd';
 import moment from 'moment';
-
-export
-default class FormTable extends Component {
+import store from '../../../state/store'
+import axios from 'axios'
+class FormTable extends Component {
     constructor(props) {
       super(props);
     }
     render() {
-      const {
+      const {login, 
         checkChange,
         editClick,
         dataSource,
@@ -129,6 +131,7 @@ default class FormTable extends Component {
         render: (text, record) =>
           <div className = 'opera' > 
             <span onClick = { () =>editClick(record.key)}><Icon type = "edit" />标注 </span><br /> 
+            <span onClick={login}><Icon type = "edit" />标注1 </span><br /> 
             {/* <span> <Popconfirm title = "确定要删除吗?"onConfirm = { () =>onDelete(record.key)} > <Icon type = "minus-square-o" />删除 </Popconfirm></span >  */}
           </div>
       }
@@ -161,3 +164,32 @@ default class FormTable extends Component {
       /> )
       }
     }
+    let mapStateToProps = state => {
+      return state
+    }
+    
+    let mapDispatchToProps = dispatch => {
+      console.log(' M in')
+      return {
+        login: async () => {
+          let state = store.getState()
+          console.log(state)
+          let { username, password } = state
+          if (username == '' || password == '') return message.error('账号和密码不能为空！')
+          let tips = message.loading('登录中...')
+          let res = await axios({
+            method: 'post',
+            url: `${state.path}/api/login`,
+            data: { username, password },
+            withCredentials: true
+          })
+          message.destroy(tips)
+          if (res.data.code != 0) return message.error('登录失败，账号或密码错误！')
+          dispatch({ type: 'SET_IS_LOGIN', isLogin: true })
+          document.getElementById('login').click()
+        },
+        usernameChange: e => dispatch({ type: "SET_USERNAME", username: e.target.value }),
+        passwordChange: e => dispatch({ type: "SET_PASSWORD", password: e.target.value })
+      }
+    }
+    export default connect(mapStateToProps, mapDispatchToProps)(FormTable)
